@@ -6,7 +6,7 @@ import re
 def main():
     rendering_engine()
 
-# TODO: タグにリンクが紐づいている場合、タグ内のaタグのテキストを見る必要がある
+# TODO: 入れこのタグに対応する
 
 
 def rendering_engine():
@@ -18,18 +18,16 @@ def rendering_engine():
     # htmlをstrに変換
     html_str = str(soup)
 
-    # htmlのサンプル
-    # html_str = '<title>タイトル</title>\n<h1>moji</h1>'
+    # HTML文字列を定義
+    # html_str = '<title>タイトル</title>\n<h1>moji</h1>\n'
 
     # 書き込み用ファイルを用意
     f = open('./md/myfile.md', 'w', encoding='UTF-8')
 
-    # タグを見つける
+    # タグとテキストを抽出
     tag_list = re.findall(r'<.*>.*</.*>', html_str)
-
-    # レンダリングして今回はマークダウンにする
     for tag_include_text in tag_list:
-        # タグを取得
+        # タグを抽出
         tag_prefix_match = re.search(r'<[a-z_0-9]*>', tag_include_text)
         if not tag_prefix_match:
             continue
@@ -37,14 +35,17 @@ def rendering_engine():
         tag_suffix_match = re.search(r'</[a-z_0-9]*>', tag_include_text)
         tag_suffix = tag_suffix_match.group()
 
-        # タグを削除して文字列だけ取り出す
+        # タグを削除してテキストコンテンツだけ取り出す
         except_prefix_text = tag_include_text.replace(tag_prefix, '')
         text = except_prefix_text.replace(tag_suffix, '')
-        # マークダウンに変換
+
+        # タグで場合分けし、マークダウンに変換
         if tag_prefix == '<title>':
             f.write(F'# {text}\n')
         elif tag_prefix == '<h1>':
             f.write(F'## {text}\n')
+
+    f.close()
 
 
 if __name__ == "__main__":
